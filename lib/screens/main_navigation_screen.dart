@@ -25,47 +25,144 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: _screens[_currentIndex],
-      bottomNavigationBar: Container(
-        decoration: const BoxDecoration(
-          border: Border(
-            top: BorderSide(color: Colors.grey, width: 0.5),
-          ),
+      bottomNavigationBar: SafeArea(
+        top: false,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              height: 80,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                border: Border(
+                  top: BorderSide(
+                    color: AppTheme.neutralGrey.withValues(alpha: 0.2),
+                    width: 1,
+                  ),
+                ),
+              ),
+              child: Row(
+                children: [
+                  _NavItem(
+                    label: 'HOME',
+                    isSelected: _currentIndex == 0,
+                    activeIcon: Icons.home,
+                    inactiveIcon: Icons.home_outlined,
+                    onTap: () {
+                      setState(() {
+                        _currentIndex = 0;
+                      });
+                    },
+                  ),
+                  _NavItem(
+                    label: 'ALERTS',
+                    isSelected: _currentIndex == 1,
+                    activeIcon: Icons.notifications,
+                    inactiveIcon: Icons.notifications_none,
+                    onTap: () {
+                      setState(() {
+                        _currentIndex = 1;
+                      });
+                    },
+                  ),
+                  _NavItem(
+                    label: 'PROFILE',
+                    isSelected: _currentIndex == 2,
+                    activeIcon: Icons.person,
+                    inactiveIcon: Icons.person_outline,
+                    onTap: () {
+                      setState(() {
+                        _currentIndex = 2;
+                      });
+                    },
+                  ),
+                ],
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(top: 16, bottom: 32),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Text(
+                    'SECURE ACCESS',
+                    style: TextStyle(
+                      fontFamily: 'Inter',
+                      color: AppTheme.neutralGrey,
+                      fontSize: 10,
+                      fontWeight: FontWeight.w500,
+                      letterSpacing: 3.0,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Container(
+                    width: 4,
+                    height: 4,
+                    decoration: const BoxDecoration(
+                      color: AppTheme.neutralGrey,
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  const Text(
+                    'PRIVACY ENSURED',
+                    style: TextStyle(
+                      fontFamily: 'Inter',
+                      color: AppTheme.neutralGrey,
+                      fontSize: 10,
+                      fontWeight: FontWeight.w500,
+                      letterSpacing: 3.0,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
-        child: BottomNavigationBar(
-          currentIndex: _currentIndex,
-          onTap: (index) {
-            setState(() {
-              _currentIndex = index;
-            });
-          },
-          type: BottomNavigationBarType.fixed,
-          backgroundColor: Colors.white,
-          selectedItemColor: Colors.black,
-          unselectedItemColor: AppTheme.textSecondary,
-          showSelectedLabels: true,
-          showUnselectedLabels: true,
-          selectedLabelStyle: const TextStyle(
-            fontSize: 12,
-            fontWeight: FontWeight.w600,
-            letterSpacing: 0.5,
-          ),
-          unselectedLabelStyle: const TextStyle(
-            fontSize: 12,
-            fontWeight: FontWeight.w400,
-            letterSpacing: 0.5,
-          ),
-          items: const [
-            BottomNavigationBarItem(
-              icon: Icon(Icons.home),
-              label: 'HOME',
+      ),
+    );
+  }
+}
+
+class _NavItem extends StatelessWidget {
+  const _NavItem({
+    required this.label,
+    required this.isSelected,
+    required this.activeIcon,
+    required this.inactiveIcon,
+    required this.onTap,
+  });
+
+  final String label;
+  final bool isSelected;
+  final IconData activeIcon;
+  final IconData inactiveIcon;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final color = isSelected ? AppTheme.primaryBlack : AppTheme.neutralGrey;
+    return Expanded(
+      child: InkWell(
+        onTap: onTap,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              isSelected ? activeIcon : inactiveIcon,
+              color: color,
+              size: 24,
             ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.notifications),
-              label: 'ALERTS',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.person),
-              label: 'PROFILE',
+            const SizedBox(height: 6),
+            Text(
+              label,
+              style: TextStyle(
+                fontFamily: 'Inter',
+                fontSize: 11,
+                fontWeight: FontWeight.w700,
+                color: isSelected ? AppTheme.primaryBlack : AppTheme.neutralGrey,
+                letterSpacing: 1.2,
+              ),
             ),
           ],
         ),
