@@ -12,139 +12,173 @@ class OnboardingScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: AppTheme.backgroundColor,
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(AppConstants.defaultPadding),
-          child: ConstrainedBox(
-            constraints: BoxConstraints(
-              minHeight: MediaQuery.of(context).size.height - 
-                         MediaQuery.of(context).padding.top - 
-                         AppConstants.defaultPadding * 2,
-            ),
-            child: Column(
-            children: [
-              const SizedBox(height: 60),
-              
-              // App Logo/Icon
-              Container(
-                width: 80,
-                height: 80,
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.black, width: 2),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: const Icon(
-                  Icons.pets,
-                  size: 40,
-                  color: Colors.black,
-                ),
-              ),
-              
-              const SizedBox(height: 60),
-              
-              // App Title
-              const Text(
-                'Rapid',
-                style: TextStyle(
-                  fontSize: 40,
-                  fontWeight: FontWeight.bold,
-                  color: AppTheme.primaryBlack,
-                  height: 1.1,
-                ),
-              ),
-              
-              const Text(
-                'Response Team',
-                style: TextStyle(
-                  fontSize: 40,
-                  fontWeight: FontWeight.w300,
-                  color: AppTheme.neutralGrey,
-                  height: 1.1,
-                ),
-              ),
-              
-              const SizedBox(height: AppConstants.brandBodySpacing),
-              
-              // Description
-              const Text(
-                'Grant location access to see alerts in your district and ensure help reaches you quickly.',
-                style: TextStyle(
-                  fontSize: 18,
-                  color: AppTheme.primaryBlack,
-                  height: 1.5,
-                  letterSpacing: -0.01,
-                ),
-                textAlign: TextAlign.left,
-              ),
-              
-              const SizedBox(height: AppConstants.brandBodySpacing),
-              
-              // Get Started Button
-              Container(
-                width: double.infinity,
-                height: AppConstants.primaryButtonHeight,
-                decoration: BoxDecoration(
-                  color: AppTheme.primaryBlack,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: InkWell(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => const ProfileCreateScreen()),
-                    );
-                  },
-                  child: const Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        'GET STARTED',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                          letterSpacing: 1.2,
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            return SingleChildScrollView(
+              child: ConstrainedBox(
+                constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                child: IntrinsicHeight(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 40),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const SizedBox(height: 80),
+
+                        // App Logo/Icon
+                        Container(
+                          width: 64,
+                          height: 64,
+                          decoration: BoxDecoration(
+                            border: Border.all(color: AppTheme.primaryBlack, width: 2),
+                          ),
+                          child: const Icon(
+                            Icons.pets,
+                            size: 32,
+                            color: AppTheme.primaryBlack,
+                          ),
                         ),
-                      ),
-                      SizedBox(width: 8),
-                      Icon(
-                        Icons.arrow_forward,
-                        color: Colors.white,
-                        size: 20,
-                      ),
-                    ],
+
+                        const SizedBox(height: 48),
+
+                        // App Title
+                        const Text(
+                          'Rapid',
+                          style: TextStyle(
+                            fontFamily: 'Inter',
+                            fontSize: 48,
+                            fontWeight: FontWeight.w800,
+                            color: AppTheme.primaryBlack,
+                            height: 1.1,
+                          ),
+                        ),
+
+                        const Text(
+                          'Response Team',
+                          style: TextStyle(
+                            fontFamily: 'Inter',
+                            fontSize: 48,
+                            fontWeight: FontWeight.w800,
+                            color: AppTheme.neutralGrey,
+                            height: 1.1,
+                          ),
+                        ),
+
+                        const SizedBox(height: 56),
+
+                        // Description
+                        const Text(
+                          'Grant location access to see alerts in your district and ensure help reaches you quickly.',
+                          style: TextStyle(
+                            fontFamily: 'Inter',
+                            fontSize: 24,
+                            fontWeight: FontWeight.w500,
+                            color: AppTheme.primaryBlack,
+                            height: 1.4,
+                            letterSpacing: -0.24,
+                          ),
+                        ),
+
+                        const Spacer(),
+
+                        // Get Started Button
+                        Container(
+                          width: double.infinity,
+                          height: 80,
+                          decoration: const BoxDecoration(
+                            color: AppTheme.primaryBlack,
+                            borderRadius: BorderRadius.zero,
+                          ),
+                          child: InkWell(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (context) => const ProfileCreateScreen()),
+                              );
+                            },
+                            child: Row(
+                              children: [
+                                const Expanded(
+                                  child: Center(
+                                    child: Text(
+                                      'GET STARTED',
+                                      style: TextStyle(
+                                        fontFamily: 'Inter',
+                                        color: AppTheme.pureWhite,
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.w700,
+                                        letterSpacing: 3.6,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                Container(
+                                  width: 1,
+                                  height: 80,
+                                  color: AppTheme.pureWhite,
+                                ),
+                                const SizedBox(
+                                  width: 80,
+                                  child: Center(
+                                    child: Icon(
+                                      Icons.east,
+                                      color: AppTheme.pureWhite,
+                                      size: 24,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+
+                        const SizedBox(height: 24),
+
+                        // Footer
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Text(
+                              'SECURE ACCESS',
+                              style: TextStyle(
+                                fontFamily: 'Inter',
+                                color: AppTheme.neutralGrey,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w500,
+                                letterSpacing: 3.6,
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Container(
+                              width: 4,
+                              height: 4,
+                              decoration: const BoxDecoration(
+                                color: AppTheme.neutralGrey,
+                                shape: BoxShape.circle,
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            const Text(
+                              'PRIVACY ENSURED',
+                              style: TextStyle(
+                                fontFamily: 'Inter',
+                                color: AppTheme.neutralGrey,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w500,
+                                letterSpacing: 3.6,
+                              ),
+                            ),
+                          ],
+                        ),
+
+                        const SizedBox(height: 64),
+                      ],
+                    ),
                   ),
                 ),
               ),
-              
-              const SizedBox(height: 40),
-              
-              // Footer
-              const Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  Text(
-                    'SECURE ACCESS',
-                    style: TextStyle(
-                      color: AppTheme.textSecondary,
-                      fontSize: 12,
-                      letterSpacing: 1.0,
-                    ),
-                  ),
-                  Text(
-                    'PRIVACY ENSURED',
-                    style: TextStyle(
-                      color: AppTheme.textSecondary,
-                      fontSize: 12,
-                      letterSpacing: 1.0,
-                    ),
-                  ),
-                ],
-              ),
-              
-              const SizedBox(height: 20),
-            ],
-            ),
-          ),
+            );
+          },
         ),
       ),
     );
