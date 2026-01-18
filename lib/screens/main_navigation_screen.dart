@@ -46,8 +46,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                   _NavItem(
                     label: 'HOME',
                     isSelected: _currentIndex == 0,
-                    activeIcon: Icons.home,
-                    inactiveIcon: Icons.home_outlined,
+                    icon: Icons.home,
                     onTap: () {
                       setState(() {
                         _currentIndex = 0;
@@ -57,8 +56,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                   _NavItem(
                     label: 'ALERTS',
                     isSelected: _currentIndex == 1,
-                    activeIcon: Icons.notifications,
-                    inactiveIcon: Icons.notifications_none,
+                    icon: Icons.notifications,
                     onTap: () {
                       setState(() {
                         _currentIndex = 1;
@@ -68,8 +66,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                   _NavItem(
                     label: 'PROFILE',
                     isSelected: _currentIndex == 2,
-                    activeIcon: Icons.person,
-                    inactiveIcon: Icons.person_outline,
+                    icon: Icons.person,
                     onTap: () {
                       setState(() {
                         _currentIndex = 2;
@@ -90,11 +87,11 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                   const Text(
                     'SECURE ACCESS',
                     style: TextStyle(
-                      fontFamily: 'Inter',
+                      fontFamily: 'JetBrainsMono',
                       color: AppTheme.neutralGrey,
                       fontSize: 10,
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: 2.5,
+                      fontWeight: FontWeight.w400,
+                      letterSpacing: 1.5,
                     ),
                   ),
                   Container(
@@ -108,11 +105,11 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                   const Text(
                     'PRIVACY ENSURED',
                     style: TextStyle(
-                      fontFamily: 'Inter',
+                      fontFamily: 'JetBrainsMono',
                       color: AppTheme.neutralGrey,
                       fontSize: 10,
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: 2.5,
+                      fontWeight: FontWeight.w400,
+                      letterSpacing: 1.5,
                     ),
                   ),
                 ],
@@ -129,15 +126,13 @@ class _NavItem extends StatelessWidget {
   const _NavItem({
     required this.label,
     required this.isSelected,
-    required this.activeIcon,
-    required this.inactiveIcon,
+    required this.icon,
     required this.onTap,
   });
 
   final String label;
   final bool isSelected;
-  final IconData activeIcon;
-  final IconData inactiveIcon;
+  final IconData icon;
   final VoidCallback onTap;
 
   @override
@@ -150,7 +145,7 @@ class _NavItem extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(
-              isSelected ? activeIcon : inactiveIcon,
+              icon,
               color: color,
               size: 24,
             ),
@@ -159,11 +154,13 @@ class _NavItem extends StatelessWidget {
               label,
               style: TextStyle(
                 fontFamily: 'Inter',
-                fontSize: 11,
+                fontSize: 10,
                 fontWeight: FontWeight.w700,
                 color: isSelected ? AppTheme.primaryBlack : AppTheme.neutralGrey,
-                letterSpacing: 0.55,
+                letterSpacing: 1.2,
               ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
           ],
         ),
