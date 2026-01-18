@@ -31,7 +31,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Container(
-              height: 80,
+              height: 88,
               decoration: BoxDecoration(
                 color: Colors.white,
                 border: Border(
@@ -80,7 +80,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.only(top: 16, bottom: 32),
+              padding: const EdgeInsets.only(top: 16, bottom: 24),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -90,8 +90,8 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                       fontFamily: 'Inter',
                       color: AppTheme.neutralGrey,
                       fontSize: 10,
-                      fontWeight: FontWeight.w500,
-                      letterSpacing: 3.0,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 2.5,
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -110,8 +110,8 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                       fontFamily: 'Inter',
                       color: AppTheme.neutralGrey,
                       fontSize: 10,
-                      fontWeight: FontWeight.w500,
-                      letterSpacing: 3.0,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 2.5,
                     ),
                   ),
                 ],
@@ -161,7 +161,7 @@ class _NavItem extends StatelessWidget {
                 fontSize: 11,
                 fontWeight: FontWeight.w700,
                 color: isSelected ? AppTheme.primaryBlack : AppTheme.neutralGrey,
-                letterSpacing: 1.2,
+                letterSpacing: 0.55,
               ),
             ),
           ],

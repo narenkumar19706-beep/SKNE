@@ -40,8 +40,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
                         // App Logo/Icon
                         Container(
-                          width: 48,
-                          height: 48,
+                          width: 56,
+                          height: 56,
                           decoration: BoxDecoration(
                             border: Border.all(color: AppTheme.primaryBlack, width: 1.5),
                           ),
@@ -59,7 +59,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           'Rapid',
                           style: TextStyle(
                             fontFamily: 'Inter',
-                            fontSize: 48,
+                            fontSize: 44,
                             fontWeight: FontWeight.w800,
                             color: AppTheme.primaryBlack,
                             height: 1.1,
@@ -69,7 +69,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           'Response Team',
                           style: TextStyle(
                             fontFamily: 'Inter',
-                            fontSize: 48,
+                            fontSize: 44,
                             fontWeight: FontWeight.w800,
                             color: AppTheme.neutralGrey,
                             height: 1.1,
@@ -99,7 +99,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                   style: TextStyle(
                                     fontFamily: 'Inter',
                                     fontSize: 16,
-                                    fontWeight: FontWeight.w500,
+                                    fontWeight: FontWeight.w700,
                                     color: AppTheme.neutralGrey,
                                   ),
                                 ),
@@ -138,7 +138,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                       style: TextStyle(
                                         fontFamily: 'Inter',
                                         fontSize: 16,
-                                        fontWeight: FontWeight.w500,
+                                        fontWeight: FontWeight.w700,
                                         color: AppTheme.neutralGrey,
                                       ),
                                     ),
@@ -177,7 +177,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                     style: const TextStyle(
                                       fontFamily: 'Inter',
                                       fontSize: 16,
-                                      fontWeight: FontWeight.w500,
+                                      fontWeight: FontWeight.w700,
                                       color: AppTheme.neutralGrey,
                                     ),
                                   ),
@@ -201,10 +201,24 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              // SOS Button
+                              // READY Button
                               Stack(
-                                clipBehavior: Clip.none,
+                                alignment: Alignment.center,
                                 children: [
+                                  Container(
+                                    width: 240,
+                                    height: 240,
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: const Color(0xFFFF3B30).withValues(alpha: 0.2),
+                                          blurRadius: 40,
+                                          spreadRadius: 10,
+                                        ),
+                                      ],
+                                    ),
+                                  ),
                                   Material(
                                     color: Colors.transparent,
                                     shape: const CircleBorder(),
@@ -219,129 +233,66 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                           ),
                                         );
                                       },
-                                      child: Container(
-                                        width: 220,
-                                        height: 220,
-                                        decoration: BoxDecoration(
-                                          shape: BoxShape.circle,
-                                          gradient: const RadialGradient(
-                                            colors: [
-                                              Color(0xFFFF0000),
-                                              Color(0xFFCC0000),
-                                            ],
-                                            center: Alignment(-0.2, -0.3),
-                                            radius: 0.9,
-                                          ),
-                                          boxShadow: [
-                                            BoxShadow(
-                                              color: Colors.black.withValues(alpha: 0.4),
-                                              blurRadius: 20,
+                                      child: Stack(
+                                        alignment: Alignment.center,
+                                        children: [
+                                          Container(
+                                            width: 240,
+                                            height: 240,
+                                            decoration: const BoxDecoration(
+                                              shape: BoxShape.circle,
+                                              gradient: RadialGradient(
+                                                colors: [
+                                                  Color(0xFFFF3B30),
+                                                  Color(0xFFD70015),
+                                                ],
+                                                center: Alignment(0.0, -0.3),
+                                                radius: 0.8,
+                                              ),
                                             ),
-                                          ],
-                                        ),
-                                        child: const Center(
-                                          child: Text(
-                                            'SOS',
+                                          ),
+                                          Container(
+                                            width: 220,
+                                            height: 220,
+                                            decoration: BoxDecoration(
+                                              shape: BoxShape.circle,
+                                              gradient: RadialGradient(
+                                                colors: [
+                                                  Colors.white.withValues(alpha: 0.35),
+                                                  Colors.white.withValues(alpha: 0.0),
+                                                ],
+                                                center: const Alignment(0.0, -0.8),
+                                                radius: 0.7,
+                                              ),
+                                            ),
+                                          ),
+                                          const Text(
+                                            'READY',
                                             style: TextStyle(
                                               fontFamily: 'Inter',
-                                              fontSize: 40,
+                                              fontSize: 48,
                                               fontWeight: FontWeight.w800,
                                               color: AppTheme.pureWhite,
                                             ),
                                           ),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  Positioned(
-                                    right: -4,
-                                    bottom: -4,
-                                    child: Container(
-                                      width: 48,
-                                      height: 48,
-                                      decoration: const BoxDecoration(
-                                        color: AppTheme.primaryBlack,
-                                        shape: BoxShape.circle,
-                                      ),
-                                      child: const Center(
-                                        child: Icon(
-                                          Icons.lock,
-                                          size: 20,
-                                          color: AppTheme.pureWhite,
-                                        ),
+                                        ],
                                       ),
                                     ),
                                   ),
                                 ],
                               ),
 
-                              const SizedBox(height: 32),
+                              const SizedBox(height: 40),
 
                               const Text(
-                                'Locked for safety',
+                                'Press and hold for 3s to send alert',
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
                                   fontFamily: 'Inter',
-                                  fontSize: 28,
-                                  fontWeight: FontWeight.w700,
-                                  color: AppTheme.primaryBlack,
-                                  height: 1.2,
-                                ),
-                              ),
-                              const SizedBox(height: 8),
-                              const Text(
-                                'Slide to activate',
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  fontFamily: 'Inter',
-                                  fontSize: 24,
+                                  fontSize: 20,
                                   fontWeight: FontWeight.w700,
                                   color: AppTheme.neutralGrey,
                                   height: 1.2,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-
-                        // Primary CTA
-                        Container(
-                          width: double.infinity,
-                          height: 80,
-                          decoration: const BoxDecoration(
-                            color: AppTheme.primaryBlack,
-                            borderRadius: BorderRadius.zero,
-                          ),
-                          child: Row(
-                            children: [
-                              const Expanded(
-                                child: Center(
-                                  child: Text(
-                                    'SLIDE TO ACTIVATE',
-                                    style: TextStyle(
-                                      fontFamily: 'Inter',
-                                      color: AppTheme.pureWhite,
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.w700,
-                                      letterSpacing: 2.7,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              Container(
-                                width: 1,
-                                height: 80,
-                                color: AppTheme.pureWhite,
-                              ),
-                              const SizedBox(
-                                width: 80,
-                                height: 80,
-                                child: Center(
-                                  child: Icon(
-                                    Icons.east,
-                                    color: AppTheme.pureWhite,
-                                    size: 24,
-                                  ),
                                 ),
                               ),
                             ],
@@ -389,7 +340,7 @@ class _LocationRow extends StatelessWidget {
             style: TextStyle(
               fontFamily: 'Inter',
               fontSize: 16,
-              fontWeight: FontWeight.w500,
+              fontWeight: FontWeight.w700,
               color: textColor,
             ),
           ),
