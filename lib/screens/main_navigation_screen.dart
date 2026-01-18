@@ -81,8 +81,11 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
             ),
             Padding(
               padding: const EdgeInsets.only(top: 16, bottom: 24),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
+              child: Wrap(
+                alignment: WrapAlignment.center,
+                crossAxisAlignment: WrapCrossAlignment.center,
+                spacing: 12,
+                runSpacing: 6,
                 children: [
                   const Text(
                     'SECURE ACCESS',
@@ -94,7 +97,6 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                       letterSpacing: 2.5,
                     ),
                   ),
-                  const SizedBox(width: 12),
                   Container(
                     width: 4,
                     height: 4,
@@ -103,7 +105,6 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                       shape: BoxShape.circle,
                     ),
                   ),
-                  const SizedBox(width: 12),
                   const Text(
                     'PRIVACY ENSURED',
                     style: TextStyle(

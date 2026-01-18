@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../core/theme/app_theme.dart';
@@ -27,6 +29,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       body: SafeArea(
         child: LayoutBuilder(
           builder: (context, constraints) {
+            final double maxWidth = constraints.maxWidth;
+            final double buttonSize = math.min(240, maxWidth - 64);
+            final double innerHighlightSize = buttonSize * 0.9;
+            final double topSpacing = math.min(64, constraints.maxHeight * 0.12);
+            final double logoSize = math.min(56, maxWidth * 0.18);
+            final double brandFontSize = math.max(36, math.min(44, maxWidth * 0.14));
+            final double titleGap = math.min(32, constraints.maxHeight * 0.06);
+            final double instructionGap = math.min(40, constraints.maxHeight * 0.08);
             return SingleChildScrollView(
               child: ConstrainedBox(
                 constraints: BoxConstraints(minHeight: constraints.maxHeight),
@@ -36,12 +46,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const SizedBox(height: 64),
+                        SizedBox(height: topSpacing),
 
                         // App Logo/Icon
                         Container(
-                          width: 56,
-                          height: 56,
+                          width: logoSize,
+                          height: logoSize,
                           decoration: BoxDecoration(
                             border: Border.all(color: AppTheme.primaryBlack, width: 1.5),
                           ),
@@ -52,24 +62,24 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           ),
                         ),
 
-                        const SizedBox(height: 32),
+                        SizedBox(height: titleGap),
 
                         // App Title
-                        const Text(
+                        Text(
                           'Rapid',
                           style: TextStyle(
                             fontFamily: 'Inter',
-                            fontSize: 44,
+                            fontSize: brandFontSize,
                             fontWeight: FontWeight.w800,
                             color: AppTheme.primaryBlack,
                             height: 1.1,
                           ),
                         ),
-                        const Text(
+                        Text(
                           'Response Team',
                           style: TextStyle(
                             fontFamily: 'Inter',
-                            fontSize: 44,
+                            fontSize: brandFontSize,
                             fontWeight: FontWeight.w800,
                             color: AppTheme.neutralGrey,
                             height: 1.1,
@@ -206,8 +216,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                 alignment: Alignment.center,
                                 children: [
                                   Container(
-                                    width: 240,
-                                    height: 240,
+                                    width: buttonSize,
+                                    height: buttonSize,
                                     decoration: BoxDecoration(
                                       shape: BoxShape.circle,
                                       boxShadow: [
@@ -237,8 +247,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                         alignment: Alignment.center,
                                         children: [
                                           Container(
-                                            width: 240,
-                                            height: 240,
+                                            width: buttonSize,
+                                            height: buttonSize,
                                             decoration: const BoxDecoration(
                                               shape: BoxShape.circle,
                                               gradient: RadialGradient(
@@ -252,8 +262,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                             ),
                                           ),
                                           Container(
-                                            width: 220,
-                                            height: 220,
+                                            width: innerHighlightSize,
+                                            height: innerHighlightSize,
                                             decoration: BoxDecoration(
                                               shape: BoxShape.circle,
                                               gradient: RadialGradient(
@@ -266,13 +276,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                               ),
                                             ),
                                           ),
-                                          const Text(
-                                            'READY',
-                                            style: TextStyle(
-                                              fontFamily: 'Inter',
-                                              fontSize: 48,
-                                              fontWeight: FontWeight.w800,
-                                              color: AppTheme.pureWhite,
+                                          FittedBox(
+                                            fit: BoxFit.scaleDown,
+                                            child: Text(
+                                              'READY',
+                                              style: TextStyle(
+                                                fontFamily: 'Inter',
+                                                fontSize: math.min(48, buttonSize * 0.4),
+                                                fontWeight: FontWeight.w800,
+                                                color: AppTheme.pureWhite,
+                                              ),
                                             ),
                                           ),
                                         ],
@@ -282,7 +295,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                 ],
                               ),
 
-                              const SizedBox(height: 40),
+                              SizedBox(height: instructionGap),
 
                               const Text(
                                 'Press and hold for 3s to send alert',
@@ -294,6 +307,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                   color: AppTheme.neutralGrey,
                                   height: 1.2,
                                 ),
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
                               ),
                             ],
                           ),
@@ -343,6 +358,8 @@ class _LocationRow extends StatelessWidget {
               fontWeight: FontWeight.w700,
               color: textColor,
             ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
         ),
       ],
