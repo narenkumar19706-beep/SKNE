@@ -1,12 +1,11 @@
+import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 
-enum SosState { locked, unlocked, active }
-
-/// Home screen with location display and SOS button
+/// READY state home screen with location and hold-to-send.
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
@@ -14,15 +13,32 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
-  SosState state = SosState.locked;
-
+class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMixin {
   String locationLabel = "Fetching location...";
+
+  late final AnimationController _pulseCtrl;
+
+  bool isHolding = false;
+  double holdProgress = 0.0; // 0 -> 1
+  Timer? _holdTimer;
+  static const Duration holdDuration = Duration(seconds: 3);
 
   @override
   void initState() {
     super.initState();
     _loadLocation();
+
+    _pulseCtrl = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 2),
+    )..repeat();
+  }
+
+  @override
+  void dispose() {
+    _pulseCtrl.dispose();
+    _holdTimer?.cancel();
+    super.dispose();
   }
 
   Future<void> _loadLocation() async {
@@ -86,13 +102,66 @@ class _HomeScreenState extends State<HomeScreen> {
     if (area == null) return city;
     if (city.isEmpty) return area;
 
-    // Example: "Indiranagar, Bangalore"
     return "$area, $city";
   }
 
-  void _unlock() {
+  void _onHoldStart() {
+    if (isHolding) return;
+
     setState(() {
-      state = SosState.unlocked;
+      isHolding = true;
+      holdProgress = 0.0;
+    });
+
+    final start = DateTime.now();
+
+    _holdTimer = Timer.periodic(const Duration(milliseconds: 30), (t) {
+      final elapsed = DateTime.now().difference(start);
+      final p = elapsed.inMilliseconds / holdDuration.inMilliseconds;
+
+      if (!mounted) return;
+
+      if (p >= 1.0) {
+        t.cancel();
+        _triggerSOS();
+      } else {
+        setState(() {
+          holdProgress = p.clamp(0.0, 1.0);
+        });
+      }
+    });
+  }
+
+  void _onHoldEnd() {
+    _holdTimer?.cancel();
+
+    if (!mounted) return;
+    setState(() {
+      isHolding = false;
+      holdProgress = 0.0;
+    });
+  }
+
+  Future<void> _triggerSOS() async {
+    if (!mounted) return;
+
+    setState(() {
+      isHolding = false;
+      holdProgress = 1.0;
+    });
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text("SOS Alert Sent"),
+        duration: Duration(seconds: 2),
+      ),
+    );
+
+    await Future.delayed(const Duration(milliseconds: 400));
+
+    if (!mounted) return;
+    setState(() {
+      holdProgress = 0.0;
     });
   }
 
@@ -108,10 +177,7 @@ class _HomeScreenState extends State<HomeScreen> {
             const double baseButtonSize = 192;
             final double buttonSize = math.min(baseButtonSize, availableWidth);
             final double scale = buttonSize / baseButtonSize;
-            final double badgeSize = 56 * scale;
-            final double badgeOffset = -8 * scale;
-            final double badgeBorder = 4 * scale;
-            final double badgeIconSize = 24 * scale;
+            final double progressRingSize = 212 * scale;
 
             return SingleChildScrollView(
               child: Center(
@@ -123,34 +189,29 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: IntrinsicHeight(
                     child: Column(
                       children: [
-                        // HEADER (px-8 pt-16)
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 32).copyWith(top: 32),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              // Icon Box (w-12 h-12 border border-black)
-                              Container(
-                                width: 48,
-                                height: 48,
-                                decoration: BoxDecoration(
-                                  border: Border.all(color: Colors.black, width: 1),
-                                ),
-                                child: const Center(
-                                  child: Icon(Icons.pets, size: 24, color: Colors.black),
-                                ),
-                              ),
-                              const SizedBox(width: 48, height: 48),
-                            ],
-                          ),
-                        ),
-
-                        // TITLE (px-8 mt-8)
+                        // TOP CONTENT
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 32).copyWith(top: 32),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
+                              // Icon box
+                              Container(
+                                width: 48,
+                                height: 48,
+                                padding: const EdgeInsets.all(8),
+                                decoration: BoxDecoration(
+                                  border: Border.all(color: Colors.black, width: 1),
+                                ),
+                                child: const Center(
+                                  child: Icon(
+                                    Icons.pets,
+                                    size: 24,
+                                    color: Colors.black,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: 32),
                               FittedBox(
                                 fit: BoxFit.scaleDown,
                                 alignment: Alignment.centerLeft,
@@ -185,7 +246,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               Row(
                                 children: [
                                   Icon(Icons.location_on, size: 18, color: Colors.grey.shade600),
-                                  const SizedBox(width: 4),
+                                  const SizedBox(width: 6),
                                   Flexible(
                                     child: Text(
                                       locationLabel,
@@ -203,65 +264,44 @@ class _HomeScreenState extends State<HomeScreen> {
                             ],
                           ),
                         ),
-
-                        // CENTER (flex-grow)
+                        // CENTER
                         Expanded(
                           child: Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 32),
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                // SOS + lock badge
-                                Stack(
-                                  clipBehavior: Clip.none,
-                                  children: [
-                                    _SosGlossyButton(size: buttonSize),
-                                    Positioned(
-                                      right: badgeOffset,
-                                      bottom: badgeOffset,
-                                      child: Container(
-                                        width: badgeSize,
-                                        height: badgeSize,
-                                        decoration: BoxDecoration(
-                                          color: Colors.black,
-                                          shape: BoxShape.circle,
-                                          border: Border.all(
-                                            color: Colors.white,
-                                            width: badgeBorder,
-                                          ),
-                                        ),
-                                        child: Center(
-                                          child: Icon(
-                                            state == SosState.locked ? Icons.lock : Icons.lock_open,
-                                            color: Colors.white,
-                                            size: badgeIconSize,
-                                          ),
-                                        ),
+                                GestureDetector(
+                                  onLongPressStart: (_) => _onHoldStart(),
+                                  onLongPressEnd: (_) => _onHoldEnd(),
+                                  onLongPressCancel: _onHoldEnd,
+                                  child: Stack(
+                                    alignment: Alignment.center,
+                                    children: [
+                                      _PulseGlow(
+                                        controller: _pulseCtrl,
+                                        baseColor: const Color(0xFFCC0000),
+                                        size: buttonSize,
                                       ),
-                                    ),
-                                  ],
+                                      _SosGlossyReadyButton(
+                                        size: buttonSize,
+                                        holdProgress: holdProgress,
+                                        isHolding: isHolding,
+                                        progressRingSize: progressRingSize,
+                                      ),
+                                    ],
+                                  ),
                                 ),
                                 const SizedBox(height: 24),
                                 Text(
-                                  state == SosState.locked ? "Locked for safety" : "Ready",
+                                  "Press and hold for 3s to send alert",
                                   textAlign: TextAlign.center,
-                                  style: const TextStyle(
-                                    fontFamily: "Inter",
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.w700,
-                                    color: Colors.black,
-                                  ),
-                                ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  state == SosState.locked
-                                      ? "Slide to activate"
-                                      : "Hold SOS for 3 seconds",
-                                  textAlign: TextAlign.center,
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
                                   style: TextStyle(
                                     fontFamily: "Inter",
                                     fontSize: 20,
-                                    fontWeight: FontWeight.w700,
+                                    fontWeight: FontWeight.w500,
                                     color: Colors.grey.shade400,
                                   ),
                                 ),
@@ -269,20 +309,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             ),
                           ),
                         ),
-
-                        // BOTTOM (mt-auto)
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 32).copyWith(bottom: 16),
-                          child: Column(
-                            children: [
-                              if (state == SosState.locked)
-                                SlideToActivateBar(onCompleted: _unlock)
-                              else
-                                const _UnlockedBar(),
-                              const SizedBox(height: 24),
-                            ],
-                          ),
-                        )
+                        const SizedBox(height: 24),
                       ],
                     ),
                   ),
@@ -296,94 +323,38 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
-class SlideToActivateBar extends StatefulWidget {
-  final VoidCallback onCompleted;
+class _PulseGlow extends StatelessWidget {
+  final AnimationController controller;
+  final Color baseColor;
+  final double size;
 
-  const SlideToActivateBar({super.key, required this.onCompleted});
-
-  @override
-  State<SlideToActivateBar> createState() => _SlideToActivateBarState();
-}
-
-class _SlideToActivateBarState extends State<SlideToActivateBar> {
-  double knobX = 0;
-  bool completed = false;
+  const _PulseGlow({
+    required this.controller,
+    required this.baseColor,
+    required this.size,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final width = constraints.maxWidth;
-        const height = 64.0;
-        const knobSize = 64.0;
-        final maxX = width - knobSize;
+    return AnimatedBuilder(
+      animation: controller,
+      builder: (_, __) {
+        final t = controller.value;
+        final spread = (t <= 0.7) ? (t / 0.7) * 25.0 : 25.0;
+        final opacity = (t <= 0.7) ? 0.40 * (1 - (t / 0.7)) : 0.0;
 
-        return GestureDetector(
-          onHorizontalDragUpdate: (details) {
-            if (completed) return;
-            setState(() {
-              knobX = (knobX + details.delta.dx).clamp(0, maxX);
-            });
-          },
-          onHorizontalDragEnd: (_) {
-            if (completed) return;
-
-            if (knobX >= maxX * 0.8) {
-              setState(() {
-                completed = true;
-                knobX = maxX;
-              });
-              Future.delayed(const Duration(milliseconds: 150), () {
-                widget.onCompleted();
-              });
-            } else {
-              setState(() => knobX = 0);
-            }
-          },
-          child: Container(
-            height: height,
-            color: Colors.black,
-            child: Stack(
-              children: [
-                const Center(
-                  child: FittedBox(
-                    fit: BoxFit.scaleDown,
-                    child: Text(
-                      "SLIDE TO ACTIVATE",
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        fontFamily: "Inter",
-                        fontSize: 12,
-                        fontWeight: FontWeight.w700,
-                        color: Colors.white,
-                        letterSpacing: 3.2,
-                      ),
-                    ),
-                  ),
-                ),
-                Positioned(
-                  right: knobSize,
-                  top: 0,
-                  bottom: 0,
-                  child: Container(width: 1, color: Colors.white24),
-                ),
-                AnimatedPositioned(
-                  duration: const Duration(milliseconds: 150),
-                  curve: Curves.easeOut,
-                  left: knobX,
-                  top: 0,
-                  bottom: 0,
-                  child: Container(
-                    width: knobSize,
-                    height: knobSize,
-                    alignment: Alignment.center,
-                    color: Colors.black,
-                    child: const Icon(Icons.arrow_forward, color: Colors.white, size: 24),
-                  ),
-                ),
-              ],
-            ),
+        return Container(
+          width: size,
+          height: size,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            boxShadow: [
+              BoxShadow(
+                color: baseColor.withOpacity(opacity),
+                blurRadius: 0,
+                spreadRadius: spread,
+              ),
+            ],
           ),
         );
       },
@@ -391,36 +362,18 @@ class _SlideToActivateBarState extends State<SlideToActivateBar> {
   }
 }
 
-class _UnlockedBar extends StatelessWidget {
-  const _UnlockedBar();
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      height: 64,
-      decoration: BoxDecoration(
-        border: Border.all(color: Colors.black, width: 1),
-      ),
-      child: const Center(
-        child: Text(
-          "UNLOCKED",
-          style: TextStyle(
-            fontFamily: "Inter",
-            fontSize: 12,
-            fontWeight: FontWeight.w700,
-            letterSpacing: 3.2,
-            color: Colors.black,
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _SosGlossyButton extends StatelessWidget {
-  const _SosGlossyButton({required this.size});
-
+class _SosGlossyReadyButton extends StatelessWidget {
   final double size;
+  final double holdProgress;
+  final bool isHolding;
+  final double progressRingSize;
+
+  const _SosGlossyReadyButton({
+    required this.size,
+    required this.holdProgress,
+    required this.isHolding,
+    required this.progressRingSize,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -430,66 +383,83 @@ class _SosGlossyButton extends StatelessWidget {
     final highlightLeft = 28 * scale;
     final highlightWidth = 135 * scale;
     final highlightHeight = 75 * scale;
-    final textSize = 60 * scale;
+    final textSize = 36 * scale;
 
-    return Container(
-      width: size,
-      height: size,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        gradient: const RadialGradient(
-          center: Alignment(-0.3, -0.3), // ~35% 35%
-          radius: 0.9,
-          colors: [
-            Color(0xFFFF4D4D),
-            Color(0xFFB30000),
-          ],
-        ),
-        border: Border.all(color: const Color(0xFFCC0000), width: borderWidth),
-        boxShadow: const [
-          BoxShadow(
-            offset: Offset(0, 10),
-            blurRadius: 20,
-            color: Color(0xFFB30000),
-            spreadRadius: 0,
+    return Stack(
+      alignment: Alignment.center,
+      children: [
+        Container(
+          width: size,
+          height: size,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            gradient: const RadialGradient(
+              center: Alignment(-0.3, -0.3),
+              radius: 0.9,
+              colors: [
+                Color(0xFFFF4D4D),
+                Color(0xFFB30000),
+              ],
+            ),
+            border: Border.all(color: const Color(0xFFCC0000), width: borderWidth),
+            boxShadow: [
+              BoxShadow(
+                offset: const Offset(0, 10),
+                blurRadius: 30,
+                color: const Color(0xFFB30000).withOpacity(0.40),
+              ),
+            ],
           ),
-        ],
-      ),
-      child: Stack(
-        children: [
-          Positioned(
-            top: highlightTop,
-            left: highlightLeft,
-            child: Container(
-              width: highlightWidth,
-              height: highlightHeight,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [
-                    Colors.white.withValues(alpha: 0.30),
-                    Colors.white.withValues(alpha: 0.00),
-                  ],
+          child: Stack(
+            children: [
+              Positioned(
+                top: highlightTop,
+                left: highlightLeft,
+                child: Container(
+                  width: highlightWidth,
+                  height: highlightHeight,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        Colors.white.withOpacity(0.30),
+                        Colors.white.withOpacity(0.00),
+                      ],
+                    ),
+                  ),
                 ),
               ),
-            ),
+              Center(
+                child: Text(
+                  "READY",
+                  style: TextStyle(
+                    fontFamily: "Inter",
+                    fontSize: textSize,
+                    fontWeight: FontWeight.w800,
+                    color: Colors.white,
+                    letterSpacing: -0.2,
+                  ),
+                ),
+              ),
+            ],
           ),
-          Center(
-            child: Text(
-              "SOS",
-              style: TextStyle(
-                fontFamily: "Inter",
-                fontSize: textSize,
-                fontWeight: FontWeight.w800,
-                color: Colors.white,
-                letterSpacing: -1.0,
+        ),
+        if (isHolding)
+          SizedBox(
+            width: progressRingSize,
+            height: progressRingSize,
+            child: CircularProgressIndicator(
+              value: holdProgress.clamp(0.0, 1.0),
+              strokeWidth: 6 * scale,
+              backgroundColor: Colors.transparent,
+              valueColor: AlwaysStoppedAnimation<Color>(
+                Colors.white.withOpacity(0.85),
               ),
             ),
           ),
-        ],
-      ),
+      ],
     );
   }
 }

@@ -36,7 +36,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                 color: Colors.white,
                 border: Border(
                   top: BorderSide(
-                    color: AppTheme.neutralGrey.withValues(alpha: 0.2),
+                    color: Colors.grey.shade100,
                     width: 1,
                   ),
                 ),
@@ -94,12 +94,12 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                       letterSpacing: 1.5,
                     ),
                   ),
-                  Container(
-                    width: 4,
-                    height: 4,
-                    decoration: const BoxDecoration(
-                      color: AppTheme.neutralGrey,
-                      shape: BoxShape.circle,
+                  Text(
+                    '•',
+                    style: TextStyle(
+                      fontFamily: 'JetBrainsMono',
+                      fontSize: 10,
+                      color: Colors.grey.shade200,
                     ),
                   ),
                   const Text(
